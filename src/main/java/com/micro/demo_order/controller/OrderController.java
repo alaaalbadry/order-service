@@ -7,6 +7,7 @@ import com.micro.demo_order.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +17,22 @@ import java.util.List;
 public class OrderController {
     @Autowired
     private OrderService orderService;
+
+    @GetMapping("/details")
+    public String getOrderDetails() {
+        return "Order Details for Authenticated User";
+    }
+    @GetMapping("/user/my-orders")
+    @PreAuthorize("hasRole('USER')")
+    public String getUserOrders() {
+        return "List of user's orders";
+    }
+
+    @GetMapping("/admin/all-orders")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String getAllOrders() {
+        return "List of all orders (Admin Only)";
+    }
 
     @GetMapping("list")
     public ResponseEntity<List<Order>> getOrders() {
