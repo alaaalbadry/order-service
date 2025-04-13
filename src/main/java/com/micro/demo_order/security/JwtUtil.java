@@ -4,17 +4,15 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
 import java.util.function.Function;
 
 @Component
 public class JwtUtil {
-    private static final String SECRET_KEY_BASE64 = "lYrTb0opcKgGRcUDhroaQBaLGEf37c3TiTr8lFifysI";
+    private static final String SECRET_KEY_BASE64 = "A8GI1lw4F1H4DZobInH+N9hzC3m27FEWycuHBPr7GLc=";
 
     private SecretKey getSigningKey() {
         byte[] keyBytes = Base64.getDecoder().decode(SECRET_KEY_BASE64);

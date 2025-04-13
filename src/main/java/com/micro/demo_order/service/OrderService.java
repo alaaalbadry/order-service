@@ -1,8 +1,11 @@
 package com.micro.demo_order.service;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.micro.demo_order.model.Order;
 import com.micro.demo_order.model.OrderRepository;
+import com.micro.demo_order.saga.OrderCreatedEvent;
 import org.hibernate.StaleObjectStateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
@@ -17,7 +20,9 @@ public class OrderService {
 
     @Autowired
     private final OrderRepository orderRepository;
-
+    @Autowired private OrderEventPublisher orderEventPublisher;
+    @Autowired
+    private ObjectMapper objectMapper;
     public OrderService(OrderRepository orderRepository) {
         this.orderRepository = orderRepository;
     }
@@ -41,6 +46,14 @@ public class OrderService {
         if (Order.getId() != null) {
             throw new IllegalArgumentException("New Order cannot have an ID");
         }
+        OrderCreatedEvent orderCreatedEvent = new OrderCreatedEvent("123","456",55.8);
+        String message = null;
+        try {
+            message = objectMapper.writeValueAsString(orderCreatedEvent);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        orderEventPublisher.publishOrderCreatedEvent(message);
         return orderRepository.save(Order);
     }
 }
