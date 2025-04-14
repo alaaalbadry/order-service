@@ -2,6 +2,8 @@ package com.micro.demo_order.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -25,12 +27,20 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
+        // Define admin user
         UserDetails adminUser = User.withUsername("admin")
                 .password(passwordEncoder().encode("admin123"))
                 .roles("ADMIN")
                 .build();
 
-        return new InMemoryUserDetailsManager(adminUser);
+        // Define user with USER role
+        UserDetails normalUser = User.withUsername("user")
+                .password(passwordEncoder().encode("user123"))
+                .roles("USER")
+                .build();
+
+        // Return both users
+        return new InMemoryUserDetailsManager(adminUser, normalUser);
     }
 
     @Bean
@@ -38,7 +48,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // Define JwtAuthFilter as a Bean instead of injecting it directly
     @Bean
     public JwtAuthFilter jwtAuthFilter(UserDetailsService userDetailsService) {
         return new JwtAuthFilter(jwtUtil, userDetailsService);
@@ -49,12 +58,23 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/orders/**").authenticated()
-                        .anyRequest().permitAll()
+                        // Allow public access to authentication endpoints
+                        .requestMatchers("/auth/login", "/auth/admin/login", "/auth/user/login").permitAll()
+                        // Allow both ROLE_USER and ROLE_ADMIN access to `/orders/user/details`
+                        .requestMatchers("/orders/user/details").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+                        // Allow only ROLE_ADMIN access to admin-specific endpoints
+                        .requestMatchers("/orders/admin/details", "/orders/list", "/orders/create").hasAuthority("ROLE_ADMIN")
+                        // Deny all other requests
+                        .anyRequest().denyAll()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
+        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
     }
 }

@@ -18,23 +18,20 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    @GetMapping("/details")
+    @GetMapping("/user/details")
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN')")
     public String getOrderDetails() {
         return "Order Details for Authenticated User";
     }
-    @GetMapping("/user/my-orders")
-    @PreAuthorize("hasRole('USER')")
-    public String getUserOrders() {
-        return "List of user's orders";
-    }
 
-    @GetMapping("/admin/all-orders")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String getAllOrders() {
-        return "List of all orders (Admin Only)";
+    @GetMapping("/admin/details")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public String getOrderDetailsForAdmin() {
+        return "Order Details for Authenticated Admin";
     }
 
     @GetMapping("list")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<List<Order>> getOrders() {
          List<Order> orders = orderService.findAll();
         return new ResponseEntity<>(orders, HttpStatus.OK);
@@ -42,6 +39,7 @@ public class OrderController {
     }
 
     @PostMapping("/create")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Order> createOrder(@RequestBody Order order) {
         Order createdOrder = orderService.createOrder(order);
         return new ResponseEntity<>(createdOrder, HttpStatus.CREATED);
