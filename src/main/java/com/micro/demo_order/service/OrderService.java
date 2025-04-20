@@ -3,6 +3,7 @@ package com.micro.demo_order.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.micro.demo_order.dto.OrderRequest;
 import com.micro.demo_order.model.Order;
 import com.micro.demo_order.model.OrderRepository;
 import com.micro.demo_order.saga.OrderCreatedEvent;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -55,5 +57,15 @@ public class OrderService {
         }
         orderEventPublisher.publishOrderCreatedEvent(message);
         return orderRepository.save(Order);
+    }
+
+    public void placeOrder(OrderRequest request) {
+        Order order = new Order();
+        order.setProductId(request.getProductId());
+        order.setQuantity(request.getQuantity());
+        order.setAmount(request.getTotalPrice());
+        order.setDate(LocalDateTime.now());
+
+        orderRepository.save(order);
     }
 }

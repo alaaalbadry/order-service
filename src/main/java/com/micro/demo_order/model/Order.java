@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -16,8 +17,10 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String productId;
+    private int quantity;
     private String name;
-    private Date date;
+    private LocalDateTime date;
     private BigDecimal amount;
     @Version // Enables optimistic locking
     private Integer version;

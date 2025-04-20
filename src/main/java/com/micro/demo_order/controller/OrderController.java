@@ -1,6 +1,7 @@
 package com.micro.demo_order.controller;
 
 
+import com.micro.demo_order.dto.OrderRequest;
 import com.micro.demo_order.model.Order;
 import com.micro.demo_order.model.OrderRepository;
 import com.micro.demo_order.service.OrderService;
@@ -43,6 +44,13 @@ public class OrderController {
     public ResponseEntity<Order> createOrder(@RequestBody Order order) {
         Order createdOrder = orderService.createOrder(order);
         return new ResponseEntity<>(createdOrder, HttpStatus.CREATED);
+    }
+
+
+    @PostMapping("/place")
+    public ResponseEntity<String> placeOrder(@RequestBody OrderRequest orderRequest) {
+        orderService.placeOrder(orderRequest);
+        return ResponseEntity.ok("Order created successfully");
     }
 
 }
