@@ -63,7 +63,7 @@ public class SecurityConfig {
                         // Allow both ROLE_USER and ROLE_ADMIN access to `/orders/user/details`
                         .requestMatchers("/orders/user/details").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
                         // Allow only ROLE_ADMIN access to admin-specific endpoints
-                        .requestMatchers("/orders/admin/details", "/orders/list", "/orders/create").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/orders/admin/details", "/orders/list", "/orders/create","/orders/place" ).hasAuthority("ROLE_ADMIN")
                         // Deny all other requests
                         .anyRequest().denyAll()
                 )

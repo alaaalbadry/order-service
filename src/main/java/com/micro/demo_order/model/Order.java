@@ -21,7 +21,7 @@ public class Order {
     private int quantity;
     private String name;
     private LocalDateTime date;
-    private BigDecimal amount;
+    private double amount;
     @Version // Enables optimistic locking
     private Integer version;
 }

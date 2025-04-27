@@ -35,7 +35,7 @@ public class OrderService {
 
     @Retryable(value = StaleObjectStateException.class, maxAttempts = 3)
     @Transactional
-    public void updateOrder(Long OrderId, BigDecimal newAmount) {
+    public void updateOrder(Long OrderId, double newAmount) {
         Order Order = orderRepository.findById(OrderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
@@ -63,7 +63,7 @@ public class OrderService {
         Order order = new Order();
         order.setProductId(request.getProductId());
         order.setQuantity(request.getQuantity());
-        order.setAmount(request.getTotalPrice());
+        order.setAmount(request.getAmount());
         order.setDate(LocalDateTime.now());
 
         orderRepository.save(order);
