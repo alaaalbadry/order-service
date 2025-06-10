@@ -65,6 +65,8 @@ public class OrderService {
         order.setQuantity(request.getQuantity());
         order.setAmount(request.getAmount());
         order.setDate(LocalDateTime.now());
+        order.setVersion(request.hashCode());
+        order.setName("alaa1");
 
         orderRepository.save(order);
     }
